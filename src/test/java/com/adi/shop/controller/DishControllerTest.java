@@ -3,8 +3,10 @@ package com.adi.shop.controller;
 import com.adi.shop.config.SecurityConfig;
 import com.adi.shop.model.Dish;
 import com.adi.shop.service.DishService;
+import com.adi.shop.service.Impl.DishServiceImpl;
 import com.adi.shop.service.Impl.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultHandler;
@@ -23,8 +26,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DishControllerTest {
 
     @MockBean
-    private DishService dishService;
+    private DishServiceImpl dishService;
 
     @MockBean
     private UserDetailsServiceImpl userDetailsService;
@@ -47,7 +49,7 @@ public class DishControllerTest {
 
     // addDish() test
     @Test
-    public void whenAddingDishItShouldReturnAddedDish() throws Exception{
+    public void addDish() throws Exception{
 
         // given
         String name = "Pizza";
@@ -94,7 +96,7 @@ public class DishControllerTest {
     @Test
     public void getDishesByMenuName() throws Exception {
         // given
-        Long menuId = 1L;
+        String menuName = "rynek";
         List<Dish> list = new ArrayList<>();
 
         Dish dish = new Dish();
@@ -102,12 +104,45 @@ public class DishControllerTest {
         list.add(dish);
 
         // when
-//        when(dishService.findDishByMenuId(menuId)).thenReturn(list);
+        when(dishService.findDishByMenuName(menuName)).thenReturn(list);
 
         // then
-        mvc.perform(get("/menu/{restaurantName}", "rynek")
+        mvc.perform(get("/menu/{restaurantName}", menuName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(jsonPath("$[0].name").value(dish.getName()));
+    }
+
+    @Test
+    public void removeDish() throws Exception {
+        // given
+        Long id = 1L;
+        Dish dish = new Dish();
+        dish.setName("pepperoni");
+
+        // when
+        when(dishService.removeDishById(id)).thenReturn(dish);
+
+        // then
+        mvc.perform(delete("/menu/{id}", id)
+        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(jsonPath("$.name").value(dish.getName()));
+    }
+
+    @Test
+    public void updateDish() {
+        // given
+        Long id = 1L;
+        String name = "hawaii";
+        double price = 25;
+        String description = "hawaii pizza";
+        String menuName = "halo";
+
+        Dish dish = new Dish();
+
+        // when
+
+        // then
     }
 }

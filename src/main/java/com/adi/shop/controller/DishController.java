@@ -68,7 +68,5 @@ public class DishController {
                            @RequestParam(value = "description", defaultValue = "description", required = false) String description,
                            @RequestParam(value = "menuName", defaultValue = "menu name", required = false) String menuName){
      dishService.updateDish(id, name, price, description, menuName);
-        System.out.println("TEST");
-        System.out.println(name + " " + price + " " + description + " " + menuName);
     }
 }
